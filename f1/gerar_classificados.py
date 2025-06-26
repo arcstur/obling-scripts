@@ -88,9 +88,6 @@ class ResultsSheet:
         print("Arquivo carregado!")
 
     def load_qids(self):
-        self.df[self.QID_COLUMN] = (
-            self.df[self.QID_COLUMN] - self.df[self.QID_COLUMN].min() + 1
-        )
         self.sorted_qid_list = list(np.sort(self.df[self.QID_COLUMN].unique()))
 
     def validate_answers(self):
@@ -102,13 +99,13 @@ class ResultsSheet:
             needs_fix = False
             if array[0] != answer:
                 print(
-                    f"O gabarito da Q{i + 1} está como '{array[0]}' na planilha, "
+                    f"O gabarito da Q{i + 1} (id {qid}) está como '{array[0]}' na planilha, "
                     f"e não '{answer}' como foi inserido no script"
                 )
                 needs_fix = True
             if not (array == answer).all():
                 print(
-                    f"O gabarito da Q{i + 1} possui valores inconsistentes na planilha"
+                    f"O gabarito da Q{i + 1} (id {qid}) possui valores inconsistentes na planilha"
                 )
                 needs_fix = True
             if needs_fix:
