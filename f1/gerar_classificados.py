@@ -26,6 +26,7 @@ class ResultsSheet:
     ]
     CORRECT_COUNT_COLUMN = "Acertos"
     CLASSIFIED_COLUMN = "Classificado"
+    GRADE_COLUMN = "Nota"
 
     def configure(self):
         self._set_filename()
@@ -50,6 +51,7 @@ class ResultsSheet:
     def finalize(self):
         self._print_counts()
         self._export()
+        self._export_to_system()
 
     # ---
     # CONFIGURE
@@ -57,7 +59,7 @@ class ResultsSheet:
 
     def _set_filename(self):
         self.filename = input(
-            "==> Cole aqui o nome do arquivo, localizado na mesma pasta do script: "
+            "==> Cole aqui o nome do arquivo ('.._resultados.xlsx'), localizado na mesma pasta do script: "
         )
         if not os.path.exists(self.filename):
             raise ValueError("O arquivo não existe!")
@@ -111,7 +113,7 @@ class ResultsSheet:
     def _load_file(self):
         print("Carregando o arquivo...")
         if self.filename.endswith("xlsx"):
-            self.df = pd.read_excel(self.filename)
+            self.df = pd.read_excel(self.filename, engine="calamine")
         else:
             self.df = pd.read_csv(self.filename)
         print("Arquivo carregado!")
@@ -133,7 +135,7 @@ class ResultsSheet:
                     f"e não '{answer}' como foi inserido no script"
                 )
                 needs_fix = True
-            if not (array == answer).all():
+            if not (array == array[0]).all():
                 print(
                     f"O gabarito da Q{i + 1} (id {qid}) possui valores inconsistentes na planilha"
                 )
@@ -233,6 +235,13 @@ class ResultsSheet:
         fn = f"../Classificados-{cat}.xlsx"
         print(f"Exportando para '{fn}'...")
         self.df_results.to_excel(fn)
+
+    def _export_to_system(self):
+        cat = "Mirim" if self.is_mirim else "RegularAberta"
+        fn = f"../NotasSistema-{cat}.csv"
+        print(f"Exportando para '{fn}'...")
+        self.df_results[self.GRADE_COLUMN] = 1 * self.df_results[self.CLASSIFIED_COLUMN]
+        self.df_results[[self.GRADE_COLUMN]].to_csv(fn)
 
 
 def main():
