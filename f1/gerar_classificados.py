@@ -119,7 +119,7 @@ class ResultsSheet:
         print("Arquivo carregado!")
 
     def _load_qids(self):
-        self.sorted_qid_list = list(np.sort(self.df[self.QID_COLUMN].unique()))
+        self.sorted_qid_list = [int(x) for x in np.sort(self.df[self.QID_COLUMN].unique())]
 
     def _validate_answers(self):
         print("Validando respostas...")
@@ -178,7 +178,7 @@ class ResultsSheet:
             qid_lists.append(
                 self.sorted_qid_list[current_count : current_count + cycle_count]
             )
-            current_count = cycle_count
+            current_count += cycle_count
         return qid_lists
 
     def _count_correct_answers_per_cycle(self):
